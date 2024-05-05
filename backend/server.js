@@ -1,22 +1,37 @@
 const express=require('express')
 const mongoose = require('mongoose')
 const cors = require('cors');
+require('dotenv').config();
 const bodyParser = require('body-parser');
 
 const app = express();
 
-mongoose.connect('mongodb://localhost:27017/employeedb').then( () => console.log("Connected"));
 
 
-app.use(cors ({
-    origin : '*',
-}))
+const employeeRoutes = require('./routes/EmplooyeeRoutes')
+//const adminRoutes = require('./routes/AdminRoutes')
+
+
+app.use(cors());
 
 
 
 app.use(bodyParser.json())
 
-const PORT = 9000
-app.listen(PORT,()=>{
-    console.log('Server running on',PORT);
+app.use((req, res, next) => {
+    console.log(req.path, req.method)
+    next()
+})
+
+app.use('/api',employeeRoutes);
+//app.use('/api',adminRoutes);
+
+
+mongoose.connect(process.env.MONGODB_URI)
+.then( () => console.log("Connected"))
+.catch((err) => console.log(err));
+
+
+app.listen(process.env.PORT,()=>{
+    console.log('Server running on',process.env.PORT);
 })
